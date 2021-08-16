@@ -51,6 +51,71 @@ def register(request):
                 "message": "failed",
                 "data":{"error_message": "mobile number already exists."}
                 })
+@api_view(['POST',])
+def login(request):
+    if request.method == "POST":
+        email = request.POST['email']
+        try:
+            if CustomUser.objects.filter(email=email, user_role=2).exists():
+                print('1')
+                user = CustomUser.objects.get(email=email)
+                print(user)
+                login_object = LoginUser.objects.get(user_id=user)
+                print(login_object)
+                if user:
+                    token, created = Token.objects.get_or_create(user=user)
+
+                    number = random.randint(100000,999999)
+                    login_object.otp = number
+                    login_object.save()
+                    subject = 'Please Confirm Your Account'
+                    message = 'Your 6 Digit Verification Pin: {}'.format(number)
+                    email_from = settings.EMAIL_HOST_USER
+                    recipient_list = to=[str(email)]
+                    msg = EmailMessage(subject, message, email_from, recipient_list)
+                    msg.fail_silently=False
+                    msg.send()
+
+                    print('Email send success!')
+                    print(msg.send())
+
+                    return Response({
+                        "status": 200,
+                        "message": "success",
+                        "data": {
+                            'token': token.key,
+                            'first_name': user.first_name,
+                            'phone_no': user.mobile_no,
+                            'email': user.email,
+                            'is_verified': user.is_verified,
+                            'user_profile': user.user_profile.url
+                        }
+                    })
+                else:
+                    return Response({
+                        "status": 400,
+                        "message": "failed",
+                        "data": {
+                            "error_message": "Incorrect password"
+                        }
+                    })
+            else:
+                return Response({
+                    "status": 400,
+                    "message": "failed",
+                    "data": {
+                        "error_message": "Invalid user"
+                    }
+                })
+        except:
+            return Response({
+                "status": 404,
+                "message": "failed",
+                "data": {
+                    "error_message": "Invalid user"
+                }
+            })
+
 
 
 
