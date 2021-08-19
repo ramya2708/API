@@ -1,7 +1,7 @@
 from django.urls import path
 #from users.api_views import register
 from users.api_views import register,login,verify_otp,verify_otplogin,profile_image_upload,resend_otp,profile_update,user_detail
-
+from users.api_views import get_customers
 urlpatterns=[
     path('user_register', register, name='user_register'),
     path('user_login', login, name='user_login'),
@@ -11,4 +11,5 @@ urlpatterns=[
     path('resend_otp', resend_otp, name='resend_otp'),
     path('profile_update', profile_update, name='profile_update'),
     path('user_detail/<int:mobile_no>', user_detail, name='user_detail'),
+    path('get_customers', get_customers, name='get_customers'),
 ]

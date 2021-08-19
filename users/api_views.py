@@ -10,6 +10,7 @@ from accounts.models import CustomUser
 from users.models import LoginUser
 from django.core.mail import send_mail, EmailMessage
 from django.conf import settings
+from users.serializers import UserProfileSerializer
 
 import random
 
@@ -456,4 +457,28 @@ def user_detail(request, mobile_no):
     #             })
 
                 
-        
+# get customers
+@api_view(['GET'])
+@authentication_classes([TokenAuthentication])
+@permission_classes((IsAuthenticated,))
+def get_customers(request):
+    try:
+        # custom_user_object = CustomUser.objects.get(user_id=request.user)
+        # all_customer_request = customer.objects.filter(creator_id=custom_user_object.user_id)
+        # c_list = []
+        # for one in all_customer_request:
+        #     c_list.append(one.user_id.pk)
+        custom_object = CustomUser.objects.all()
+        # customer_set = list(chain(all_customer_request, all_customer_objects))
+        serializer = UserProfileSerializer(custom_object, many=True)
+        return Response({
+            "status": 200,
+            "message": "success",
+            "data": serializer.data
+        })
+    except:
+        return Response({
+            "status": 404,
+            "message": "failed",
+            "data": "fauhaa"
+        })
